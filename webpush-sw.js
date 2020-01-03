@@ -32,14 +32,14 @@ self.addEventListener('push', function(event) {
         icon: self.pushData.icon
       };
 
-      //event.waitUntil(new Promise(function () {}));
-      event.waitUntil(self.registration.showNotification(title, options));
-
       self.clients.matchAll().then(function(clients) {
         clients.forEach(function(client) {
             client.postMessage(self.pushData);
         })
       })
+
+      //event.waitUntil(new Promise(function () {}));
+      event.waitUntil(self.registration.showNotification(title, options));
   }
 });
 
@@ -49,7 +49,7 @@ self.addEventListener('notificationclick', function(event) {
   event.notification.close();
 
   event.waitUntil(
-    clients.openWindow('https://github.com/deleolajide/webpush-test/image.png')
+    clients.openWindow('https://deleolajide.github.io/webpush-test/icon.png')
   );
 });
 

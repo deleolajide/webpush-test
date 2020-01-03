@@ -4,21 +4,18 @@ window.addEventListener("load", function()
     {
       console.log("Notification.requestPermission", result);
     });
-
 });
 
-// request WebPushLib form `window` object
+window.addEventListener("unload", function()
+{
+    unsubscribeUser();
+});
+
 const webpush =  window.WebPushLib;
 /* generate VAPID keys
  * const vapidKeys = webpush.generateVAPIDKeys();
  * console.log(JSON.stringify(vapidKeys, null, 4));
  */
-
-// from `webpush.generateVAPIDKeys()`
-const ServerKeys = {
-    pubkey:  "BIuEc1QhsJnVWHBdDRSbWCqtbxPCYuaLh4cyL-6MQvM7x4N7ksUOWHIbg0qXPGChZtyUsBO7xXrU-iCtRfvW0RI",
-    privkey: "qON0RY7otTgJ1vhCQSiCbeBN6q82Aak6cQBcnCktmCA"
-}
 
 'use strict';
 
@@ -42,86 +39,48 @@ function urlB64ToUint8Array(base64String) {
   return outputArray;
 }
 
-function updateBtn() {
-  if (Notification.permission === 'denied') {
-    console.log('Push Messaging Blocked.');
-    return;
-  }
+function updateSubscriptionOnServer(subscription)
+{
+    webpush.setVapidDetails(
+       'mailto:yourmail@example.com',
+       window.vapid.pubkey,
+       window.vapid.privkey
+    );
+    const rawSubscription = JSON.parse(JSON.stringify(subscription))
 
-  if (isSubscribed) {
-    console.log('Disable Push Messaging');
-  } else {
-    console.log('Enable Push Messaging');
-  }
-}
-
-function updateSubscriptionOnServer(subscription) {
-    // note: after subscriptio, this demo reload launch new notification
-    if ( subscription ) {
-        // set VAPID details
-        webpush.setVapidDetails(
-           'mailto:yourmail@example.com',
-           'BIuEc1QhsJnVWHBdDRSbWCqtbxPCYuaLh4cyL-6MQvM7x4N7ksUOWHIbg0qXPGChZtyUsBO7xXrU-iCtRfvW0RI',
-           'qON0RY7otTgJ1vhCQSiCbeBN6q82Aak6cQBcnCktmCA'
-        );
-        // get substantial info from subscription data - {Object}
-        const rawSubscription = JSON.parse(JSON.stringify(subscription))
-
-        let payload = JSON.stringify({
-            title: 'Subversivo58 Bot',
-            body: 'Thank you for enabling Push Notifications',
-            icon: './assets/img/wp-success.png' // bot icon
-        })
-        // define options [in seconds]
-        let options = {
-            TTL: 60 // 1 minute
-        }
-        // send notification
-        webpush.sendNotification(rawSubscription, payload, options).then(response => {
-            console.log("Web Push Notification is sended 🚀 !")
-        }).catch(e => {
-            console.error(e)
-        })
-   }
+    let payload = JSON.stringify({
+        title: 'webrtc-demo',
+        body: 'Thank you for enabling Push Notifications',
+        icon: './icon.png' // bot icon
+    })
+    // define options [in seconds]
+    let options = {
+        TTL: 60 // 1 minute
+    }
+    // send notification
+    webpush.sendNotification(rawSubscription, payload, options).then(response => {
+        console.log("Web Push Notification is sended 🚀 !")
+    }).catch(e => {
+        console.error(e)
+    })
 }
 
 function subscribeUser() {
-  const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+  console.log('subscribeUser', window.vapid);
+  const applicationServerKey = urlB64ToUint8Array(window.vapid.pubkey);
 
   swRegistration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: applicationServerKey
+
   }).then(function(subscription) {
     console.log('User is subscribed.');
+    isSubscribed = true;
 
     updateSubscriptionOnServer(subscription);
 
-    isSubscribed = true;
-
-    updateBtn();
-
-    if (navigator.credentials)
-    {
-        const webpush = {pubkey: "BIuEc1QhsJnVWHBdDRSbWCqtbxPCYuaLh4cyL-6MQvM7x4N7ksUOWHIbg0qXPGChZtyUsBO7xXrU-iCtRfvW0RI", privkey: "qON0RY7otTgJ1vhCQSiCbeBN6q82Aak6cQBcnCktmCA", sub: subscription}
-
-        navigator.credentials.create({password: {id: "dele (chrome)", password: JSON.stringify(webpush)}}).then(function(credential)
-        {
-            navigator.credentials.store(credential).then(function()
-            {
-                console.log("credential management api put", credential);
-
-            }).catch(function (err) {
-                console.error("credential management api put error", err);
-            });
-
-        }).catch(function (err) {
-            console.error("credential management api put error", err);
-        });
-    } else console.error("credential management api not available");
-
   }).catch(function(err) {
     console.log('Failed to subscribe the user: ', err);
-    updateBtn();
   });
 }
 
@@ -133,12 +92,8 @@ function unsubscribeUser() {
   }).catch(function(error) {
     console.log('Error unsubscribing', error);
   }).then(function() {
-    updateSubscriptionOnServer(null);
-
     console.log('User is unsubscribed.');
     isSubscribed = false;
-
-    updateBtn();
   });
 }
 
@@ -149,23 +104,50 @@ function initializeUI() {
 
     if (navigator.credentials)
     {
+        window.vapid = {pubkey: "BIuEc1QhsJnVWHBdDRSbWCqtbxPCYuaLh4cyL-6MQvM7x4N7ksUOWHIbg0qXPGChZtyUsBO7xXrU-iCtRfvW0RI", privkey: "qON0RY7otTgJ1vhCQSiCbeBN6q82Aak6cQBcnCktmCA", sub: subscription};
+
         navigator.credentials.get({password: true, mediation: "silent"}).then(function(credential)
         {
             console.log("credential management api get", credential);
+
+            if (!credential)
+            {
+                navigator.credentials.create({password: {id: "dele (chrome)", password: JSON.stringify(webpush)}}).then(function(credential)
+                {
+                    navigator.credentials.store(credential).then(function()
+                    {
+                        console.log("credential management api put", credential);
+
+                    }).catch(function (err) {
+                        console.error("credential management api put error", err);
+                    });
+
+                }).catch(function (err) {
+                    console.error("credential management api put error", err);
+                });
+            }
+            else {
+                 window.vapid = JSON.parse(credential.password);
+            }
+
+            if (!isSubscribed) {
+              subscribeUser();
+            }
+            else {
+              swRegistration.pushManager.getSubscription().then(function(subscription) {
+                if (subscription) {
+                    updateSubscriptionOnServer(subscription);
+                }
+              }).catch(function(error) {
+                console.log('Error getting subscription', error);
+              })
+            }
 
         }).catch(function(err){
             console.error ("credential management api get error", err);
         });
     } else console.error("credential management api not available");
   });
-
-    if (isSubscribed) {
-      unsubscribeUser();
-    } else {
-      subscribeUser();
-    }
-
-    updateBtn();
 }
 
 if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -175,7 +157,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
     console.log("Broadcasted from SW : ", event.data);
   };
 
-  navigator.serviceWorker.register('webpush-sw.js').then(function(swReg) {
+  navigator.serviceWorker.register('./webpush-sw.js').then(function(swReg) {
     console.log('Service Worker is registered', swReg);
 
     swRegistration = swReg;

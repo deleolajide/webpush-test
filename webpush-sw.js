@@ -32,8 +32,8 @@ self.addEventListener('push', function(event) {
         icon: self.pushData.icon
       };
 
-      event.waitUntil(new Promise(function () {}));
-      //event.waitUntil(self.registration.showNotification(title, options));
+      //event.waitUntil(new Promise(function () {}));
+      event.waitUntil(self.registration.showNotification(title, options));
 
       self.clients.matchAll().then(function(clients) {
         clients.forEach(function(client) {
@@ -49,7 +49,7 @@ self.addEventListener('notificationclick', function(event) {
   event.notification.close();
 
   event.waitUntil(
-    clients.openWindow('https://developers.google.com/web/')
+    clients.openWindow('https://github.com/deleolajide/webpush-test/image.png')
   );
 });
 

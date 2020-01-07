@@ -9,13 +9,15 @@
 
     const postcode = urlParam("pc");
 
+    console.log("letterbox postcode", postcode);
+
     if (postcode && postcode.indexOf("web+postcode:") == 0)
     {
         const room = postcode.substring(13);
 
         navigator.credentials.get({password: true, mediation: "silent"}).then(function(credential)
         {
-            console.log("credential management api get", credential);
+            console.log("letterbox credential", credential);
             location.href = "https://meet.jit.si/" + room;
 
         }).catch(function(err){

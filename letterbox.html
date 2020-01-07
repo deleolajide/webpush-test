@@ -7,11 +7,11 @@
         return unescape(results[1] || undefined);
     };
 
-    const url = urlParam("url");
+    const postcode = urlParam("pc");
 
-    if (url && url.indexOf("web+postcode:") == 0)
+    if (postcode && postcode.indexOf("web+postcode:") == 0)
     {
-        const room = url.substring(13);
+        const room = postcode.substring(13);
 
         navigator.credentials.get({password: true, mediation: "silent"}).then(function(credential)
         {

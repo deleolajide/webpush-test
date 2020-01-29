@@ -112,8 +112,11 @@ function initializeUI() {
 
             if (!credential)
             {
-                navigator.credentials.create({password: {id: "dele (chrome)", password: JSON.stringify(webpush)}}).then(function(credential)
-                {
+                navigator.credentials.create({password: {
+                    id: "dele-webpush", name: "Dele Olajide", iconURL: "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCI+CiA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgZmlsbD0iIzU1NSIvPgogPGNpcmNsZSBjeD0iNjQiIGN5PSI0MSIgcj0iMjQiIGZpbGw9IiNmZmYiLz4KIDxwYXRoIGQ9Im0yOC41IDExMiB2LTEyIGMwLTEyIDEwLTI0IDI0LTI0IGgyMyBjMTQgMCAyNCAxMiAyNCAyNCB2MTIiIGZpbGw9IiNmZmYiLz4KPC9zdmc+Cg==",
+                    password: JSON.stringify(window.vapid)
+
+                }}).then(function(credential) {
                     navigator.credentials.store(credential).then(function()
                     {
                         console.log("credential management api put", credential);

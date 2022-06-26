@@ -29023,7 +29023,7 @@ ClientRequest.prototype._onFinish = function () {
 		}
 
 		if ( /https:\/\/fcm\.googleapis\.com/.test(self._opts.url) ) {
-                    self._opts.url = 'https://cors-anywhere.herokuapp.com/' + self._opts.url
+                    //self._opts.url = 'https://cors-anywhere.herokuapp.com/' + self._opts.url
                 }
 
 		global.fetch(self._opts.url, {

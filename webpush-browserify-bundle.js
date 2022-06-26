@@ -29031,7 +29031,7 @@ ClientRequest.prototype._onFinish = function () {
 			headers: headersList,
 			body: body || undefined,
 			mode: 'cors',
-			credentials: opts.withCredentials ? 'include' : 'same-origin',
+			credentials: 'same-origin', //opts.withCredentials ? 'include' : 'same-origin',
 			signal: signal
 		}).then(function (response) {
 			self._fetchResponse = response
@@ -29057,7 +29057,7 @@ ClientRequest.prototype._onFinish = function () {
 			xhr.responseType = self._mode.split(':')[0]
 
 		if ('withCredentials' in xhr)
-			xhr.withCredentials = !!opts.withCredentials
+			xhr.withCredentials = false //!!opts.withCredentials
 
 		if (self._mode === 'text' && 'overrideMimeType' in xhr)
 			xhr.overrideMimeType('text/plain; charset=x-user-defined')

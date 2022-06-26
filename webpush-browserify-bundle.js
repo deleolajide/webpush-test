@@ -29023,7 +29023,7 @@ ClientRequest.prototype._onFinish = function () {
 		}
 
 		if ( /https:\/\/fcm\.googleapis\.com/.test(self._opts.url) ) {
-                    //self._opts.url = 'https://cors-anywhere.herokuapp.com/' + self._opts.url
+                    self._opts.url = 'https://crossorigin.me/' + self._opts.url
                 }
 
 		global.fetch(self._opts.url, {
@@ -29031,7 +29031,7 @@ ClientRequest.prototype._onFinish = function () {
 			headers: headersList,
 			body: body || undefined,
 			mode: 'cors',
-			credentials: 'same-origin', //opts.withCredentials ? 'include' : 'same-origin',
+			credentials: opts.withCredentials ? 'include' : 'same-origin',
 			signal: signal
 		}).then(function (response) {
 			self._fetchResponse = response
@@ -29057,7 +29057,7 @@ ClientRequest.prototype._onFinish = function () {
 			xhr.responseType = self._mode.split(':')[0]
 
 		if ('withCredentials' in xhr)
-			xhr.withCredentials = false //!!opts.withCredentials
+			xhr.withCredentials = !!opts.withCredentials
 
 		if (self._mode === 'text' && 'overrideMimeType' in xhr)
 			xhr.overrideMimeType('text/plain; charset=x-user-defined')
